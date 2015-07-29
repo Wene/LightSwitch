@@ -5,23 +5,23 @@
 class Switch
 {
 public:
-    Switch(int relaisPin, int lightButtonPin, int modifyButtonPin);
+    Switch(int relayPin, int lightButtonPin, int modifyButtonPin);
     void handle();
 
 private:
-    int relais;
+    int relay;
     int lightButton;
     int modifyButton;
-    int lightCount;
-    int modifyCount;
-    int lightDuration;
-    int ticker;
+    int lightBtnPushed;
+    int modifyBtnPushed;
+    int cycleCount;
+    int cycleTicker;
     int tickerDefault;
 
     bool isOn;
 
     void readButtons();
-    void debounce();
+    void waitForRelease();
     void checkModify();
 };
 

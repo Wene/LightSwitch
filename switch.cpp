@@ -1,20 +1,20 @@
 #include "switch.h"
 #include "Arduino.h"
 
-Switch::Switch(int relaisPin, int lightButtonPin, int modifyButtonPin)
+Switch::Switch(int relayPin, int lightButtonPin, int modifyButtonPin)
 {
-    relais = relaisPin;
+    relay = relayPin;
     lightButton = lightButtonPin;
     modifyButton = modifyButtonPin;
 
-    pinMode(relais, OUTPUT);
+    pinMode(relay, OUTPUT);
     pinMode(lightButton, INPUT_PULLUP);
     pinMode(modifyButton, INPUT_PULLUP);
 
-    digitalWrite(relais, LOW);
+    digitalWrite(relay, LOW);
 
-    lightCount = 0;
-    modifyCount = 0;
+    lightBtnPushed = 0;
+    modifyBtnPushed = 0;
     isOn = false;
     tickerDefault = 6000;
     
@@ -24,21 +24,21 @@ void Switch::handle()
 {
     readButtons();
 
-    if(lightCount > 2)                   //if interaction...
+    if(lightBtnPushed > 2)                   //if interaction...
     {
         if(isOn)
         {
-            digitalWrite(relais, LOW);  //turn light off
+            digitalWrite(relay, LOW);  //turn light off
             isOn = false;
 
-            debounce();                 //wait while button is still hold        
+            waitForRelease();                 //wait while button is still hold
         }
         else
         {
-            digitalWrite(relais, HIGH); //turn light on
+            digitalWrite(relay, HIGH); //turn light on
             isOn = true;
-            ticker = tickerDefault;
-            lightDuration = 1;
+            cycleTicker = tickerDefault;
+            cycleCount = 1;
 
             checkModify();
         }
@@ -47,21 +47,21 @@ void Switch::handle()
     {
         if(isOn)
         {
-            ticker--;
-            if(ticker <= 0)
+            cycleTicker--;
+            if(cycleTicker <= 0)
             {
-                lightDuration--;
-                if(lightDuration <= 0)
+                cycleCount--;
+                if(cycleCount <= 0)
                 {
-                    digitalWrite(relais, LOW);  //turn light off
+                    digitalWrite(relay, LOW);  //turn light off
                     isOn = false;
 
-                    lightDuration = 0;
-                    ticker = 0;
+                    cycleCount = 0;
+                    cycleTicker = 0;
                 }
                 else
                 {
-                    ticker = tickerDefault;
+                    cycleTicker = tickerDefault;
                 }
             }
         }
@@ -72,34 +72,34 @@ void Switch::readButtons()
 {
      if(digitalRead(lightButton) == LOW)
      {
-         lightCount++;
-         if(lightCount > 10000)     //prevent overflow
+         lightBtnPushed++;
+         if(lightBtnPushed > 10000)     //prevent overflow
          {
-             lightCount = 10000;
+             lightBtnPushed = 10000;
          }
      }
      else
      {
-         lightCount = 0;
+         lightBtnPushed = 0;
      }
      
      if(digitalRead(modifyButton) == LOW)
      {
-         modifyCount++;
-         if(modifyCount > 10000)    //prevent overflow
+         modifyBtnPushed++;
+         if(modifyBtnPushed > 10000)    //prevent overflow
          {
-             modifyCount = 10000;
+             modifyBtnPushed = 10000;
          }
      }
      else
      {
-         modifyCount = 0;
+         modifyBtnPushed = 0;
      }
 }
 
-void Switch::debounce()
+void Switch::waitForRelease()
 {
-    while(lightCount > 2)
+    while(lightBtnPushed > 2)
     {
         readButtons();
         delay(10);
@@ -108,13 +108,13 @@ void Switch::debounce()
 
 void Switch::checkModify()
 {
-    while(lightCount > 2)
+    while(lightBtnPushed > 2)
     {
         readButtons();
-        if(modifyCount > 2)
+        if(modifyBtnPushed > 2)
         {
-            lightDuration = lightDuration * 2;
-            while(modifyCount > 2)    //wait to release modify button
+            cycleCount = cycleCount * 2;
+            while(modifyBtnPushed > 2)    //wait to release modify button
             {
                 readButtons();
                 delay(10);
