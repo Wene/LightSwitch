@@ -24,18 +24,18 @@ void Switch::handle()
 {
     readButtons();
 
-    if(lightBtnPushed > 2)                   //if interaction...
+    if(lightBtnPushed > 2)                      //if interaction...
     {
         if(isOn)
         {
-            digitalWrite(relay, LOW);  //turn light off
+            digitalWrite(relay, LOW);           //turn light off
             isOn = false;
 
-            waitForRelease();                 //wait while button is still hold
+            waitForRelease(lightBtnPushed);     //wait while button is still hold
         }
         else
         {
-            digitalWrite(relay, HIGH); //turn light on
+            digitalWrite(relay, HIGH);          //turn light on
             isOn = true;
             cycleTicker = tickerDefault;
             cycleCount = 1;
@@ -43,7 +43,7 @@ void Switch::handle()
             checkModify();
         }
     }
-    else                                //if no interaction...
+    else                                        //if no interaction...
     {
         if(isOn)
         {
@@ -53,7 +53,7 @@ void Switch::handle()
                 cycleCount--;
                 if(cycleCount <= 0)
                 {
-                    digitalWrite(relay, LOW);  //turn light off
+                    digitalWrite(relay, LOW);   //turn light off
                     isOn = false;
 
                     cycleCount = 0;
@@ -73,7 +73,7 @@ void Switch::readButtons()
      if(digitalRead(lightButton) == LOW)
      {
          lightBtnPushed++;
-         if(lightBtnPushed > 10000)     //prevent overflow
+         if(lightBtnPushed > 10000)             //prevent overflow
          {
              lightBtnPushed = 10000;
          }
@@ -86,7 +86,7 @@ void Switch::readButtons()
      if(digitalRead(modifyButton) == LOW)
      {
          modifyBtnPushed++;
-         if(modifyBtnPushed > 10000)    //prevent overflow
+         if(modifyBtnPushed > 10000)            //prevent overflow
          {
              modifyBtnPushed = 10000;
          }
@@ -97,9 +97,9 @@ void Switch::readButtons()
      }
 }
 
-void Switch::waitForRelease()
+void Switch::waitForRelease(int &button)
 {
-    while(lightBtnPushed > 2)
+    while(button > 2)
     {
         readButtons();
         delay(10);
@@ -114,11 +114,7 @@ void Switch::checkModify()
         if(modifyBtnPushed > 2)
         {
             cycleCount = cycleCount * 2;
-            while(modifyBtnPushed > 2)    //wait to release modify button
-            {
-                readButtons();
-                delay(10);
-            }
+            waitForRelease(modifyBtnPushed);    //wait to release modify button
         }
         delay(10);
     }

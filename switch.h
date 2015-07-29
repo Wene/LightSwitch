@@ -21,7 +21,7 @@ private:
     bool isOn;
 
     void readButtons();
-    void waitForRelease();
+    void waitForRelease(int &button);
     void checkModify();
 };
 
