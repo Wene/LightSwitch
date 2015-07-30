@@ -5,7 +5,7 @@
 class Switch
 {
 public:
-    Switch(int relayPin, int lightButtonPin, int modifyButtonPin);
+    Switch(int relayPin, int lightButtonPin, int modifyButtonPin, int ticker, int delay);
     void handle();
 
 private:
@@ -17,7 +17,7 @@ private:
     int cycleCount;
     int cycleTicker;
     int tickerDefault;
-
+    int delayTime;
     bool isOn;
 
     void readButtons();

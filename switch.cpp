@@ -1,7 +1,9 @@
 #include "switch.h"
 #include "Arduino.h"
 
-Switch::Switch(int relayPin, int lightButtonPin, int modifyButtonPin)
+#define LIMIT 3
+
+Switch::Switch(int relayPin, int lightButtonPin, int modifyButtonPin, int ticker, int delay)
 {
     relay = relayPin;
     lightButton = lightButtonPin;
@@ -16,15 +18,15 @@ Switch::Switch(int relayPin, int lightButtonPin, int modifyButtonPin)
     lightBtnPushed = 0;
     modifyBtnPushed = 0;
     isOn = false;
-    tickerDefault = 6000;
-    
+    tickerDefault = ticker;
+    delayTime = delay;
 }
 
 void Switch::handle()
 {
     readButtons();
 
-    if(lightBtnPushed > 2)                      //if interaction...
+    if(lightBtnPushed > LIMIT)                  //if interaction...
     {
         if(isOn)
         {
@@ -97,21 +99,21 @@ void Switch::readButtons()
      }
 }
 
-void Switch::waitForRelease(int &button)
+void Switch::waitForRelease(int &button)        //wait while the buttin in the reference is still pressed
 {
-    while(button > 2)
+    while(button > LIMIT)
     {
         readButtons();
-        delay(10);
+        delay(delayTime);
     }
 }
 
-void Switch::checkModify()
+void Switch::checkModify()                      //doubles the cycleCount every time the second button is pressed
 {
-    while(lightBtnPushed > 2)
+    while(lightBtnPushed > LIMIT)
     {
         readButtons();
-        if(modifyBtnPushed > 2)
+        if(modifyBtnPushed > LIMIT)
         {
             cycleCount = cycleCount * 2;
             waitForRelease(modifyBtnPushed);    //wait to release modify button
