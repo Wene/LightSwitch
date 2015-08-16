@@ -13,7 +13,7 @@ Switch::Switch(int relayPin, int lightButtonPin, int modifyButtonPin, int ticker
     pinMode(lightButton, INPUT_PULLUP);
     pinMode(modifyButton, INPUT_PULLUP);
 
-    digitalWrite(relay, LOW);
+    digitalWrite(relay, HIGH);                  //HIGH is off
 
     lightBtnPushed = 0;
     modifyBtnPushed = 0;
@@ -30,14 +30,14 @@ void Switch::handle()
     {
         if(isOn)
         {
-            digitalWrite(relay, LOW);           //turn light off
+            digitalWrite(relay, HIGH);          //turn light off
             isOn = false;
 
             waitForRelease(lightBtnPushed);     //wait while button is still hold
         }
         else
         {
-            digitalWrite(relay, HIGH);          //turn light on
+            digitalWrite(relay, LOW);           //turn light on
             isOn = true;
             cycleTicker = tickerDefault;
             cycleCount = 1;
@@ -55,7 +55,7 @@ void Switch::handle()
                 cycleCount--;
                 if(cycleCount <= 0)
                 {
-                    digitalWrite(relay, LOW);   //turn light off
+                    digitalWrite(relay, HIGH);  //turn light off
                     isOn = false;
 
                     cycleCount = 0;
