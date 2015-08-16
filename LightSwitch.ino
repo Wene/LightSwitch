@@ -1,7 +1,7 @@
-#define LIGHT1 8
-#define LIGHT2 9
-#define BTN1 4
-#define BTN2 5
+#define LIGHT1 7
+#define LIGHT2 6
+#define BTN1 9
+#define BTN2 8
 #define TICKER 6000
 #define DELAY 10
 
